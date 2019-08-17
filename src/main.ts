@@ -278,8 +278,8 @@ function createCommentBody(
 ### Commit information
 | | |
 | --- | --- |
-| **Author** | <a href="${userUrl}" target="_blank">${username}</a> |
-| **Commit** | <a href="${commitUrl}" target="_blank">${commitSHA}</a> |
+| **Author** | <a href="${userUrl}">${username}</a> |
+| **Commit** | <a href="${commitUrl}">${commitSHA}</a> |
 | **Commit date** | ${commitDate} |
   `
 }
