@@ -15,22 +15,34 @@ type IssueInfo = {
 
 async function run() {
   try {
-    let token = process.env.GITHUB_TOKEN as string
-    if (!token) {
-      token = core.getInput('GITHUB_TOKEN', { required: true });
+    const token = core.getInput('GITHUB_TOKEN', { required: true });
+
+    if (
+      github.context.payload.action && 
+      ![
+        'created', 
+        'edited', 
+        'opened', 
+        'reopened'
+      ].includes(github.context.payload.action)
+    ) {
+      console.log(`
+        The status of the action is no applicable ${github.context.payload.action}
+      `)
+      return
     }
 
     const issueInfo = getIssueInfo();
     if (!issueInfo) {
       console.log('Could not get the issue number from context, exiting');
-      return;
+      return
     }
 
     const { nodeId, body } = issueInfo
 
     if (!body) {
       console.log('Could not get the body of the issue, exiting');
-      return;
+      return
     }
 
     const { fileName, issueLine, branch } = getFileNameAndIssueLine(body)
