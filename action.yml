@@ -8,5 +8,4 @@ inputs:
     description: 'The GITHUB_TOKEN secret'
 runs:
   using: 'node12'
-  command: yarn install
   main: 'lib/main.js'
