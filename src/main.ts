@@ -124,7 +124,7 @@ function getFileNameAndIssueLine(body: string): ReportedInfo {
       selectedFile = file[0].replace(/"/g, '').split('/').slice(2).join('/')
       selectedLine = parseInt(line[0])
    } else {
-    const url = body.match(/blob|blame\/\s*(\S+)/i)
+    const url = body.match(/(?:blob|blame)\/\s*(\S+)/i)
 
     if (url) {
       const urlInfo = url[1].split('/')
