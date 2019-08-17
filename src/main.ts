@@ -97,6 +97,8 @@ function getIssueInfo(): IssueInfo | undefined {
     return
   }
 
+  console.log('github.context.payload', github.context.payload)
+
   return {
     body: issue.body,
     issueNodeId: issue.node_id
@@ -123,7 +125,7 @@ function getFileNameAndIssueLine(body: string): ReportedInfo {
       selectedFile = file[0].replace(/"/g, '').split('/').slice(2).join('/')
       selectedLine = parseInt(line[0])
    } else {
-    const url = body.match(/blob\/\s*(\S+)/i)
+    const url = body.match(/blob|blame\/\s*(\S+)/i)
 
     if (url) {
       const urlInfo = url[1].split('/')
