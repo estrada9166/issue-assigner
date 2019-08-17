@@ -93,12 +93,13 @@ async function run() {
 
 function getIssueInfo(): IssueInfo | undefined {
   const issue = github.context.payload.issue;
+  const comment = github.context.payload.comment
   if (!issue) {
     return
   }
 
   return {
-    body: issue.comment.body || issue.body,
+    body: comment.body || issue.body,
     issueNodeId: issue.node_id
   }
 }
