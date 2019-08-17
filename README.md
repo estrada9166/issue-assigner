@@ -5,8 +5,7 @@ Assign issues using gitlog
 ## Create a workflow:
 ```
 name: "Issue assigner"
-on: 
-- [issues, issue_comment]
+on: [issues, issue_comment]
 
 jobs:
   build:
@@ -15,12 +14,13 @@ jobs:
     - uses: actions/issue-assigner@v1
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        WITH_COMMENTS: "true"
 ```
 
 ## Create issue
-In the issue text write:
+Create the issue with the information you want to add and also, add the url
+of where the issue is happening.
+e.g
 ```
-File: src/main.ts // The name of the file with the issue
-Line: 10 // The number of the line having the issue
-Branch: develop // This is optional, by default is master
+https://github.com/estrada9166/issue-assigner/blob/master/src/main.ts#L1
 ```

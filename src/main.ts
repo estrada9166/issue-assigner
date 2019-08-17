@@ -10,12 +10,20 @@ type ReportedInfo = {
 
 type IssueInfo = {
   body: string | undefined
-  nodeId: string
+  issueNodeId: string
+}
+
+type CommitInfo = {
+  userId: string
+  commitSha: string
+  commitUrl: string
+  commitDate: string
 }
 
 async function run() {
   try {
     const token = core.getInput('GITHUB_TOKEN', { required: true });
+    const commentsEnabled = core.getInput('WITH_COMMENTS', { required: true })
 
     if (
       github.context.payload.action && 
@@ -38,7 +46,7 @@ async function run() {
       return
     }
 
-    const { nodeId, body } = issueInfo
+    const { issueNodeId, body } = issueInfo
 
     if (!body) {
       console.log('Could not get the body of the issue, exiting');
@@ -54,16 +62,28 @@ async function run() {
 
     const client = new github.GitHub(token);
 
-    const userIdToAssign = await getGitBlame(client, fileName, issueLine, branch)
+    const commitInfo = await getGitBlame(client, fileName, issueLine, branch)
 
-    if (!userIdToAssign) {
-      console.log('No user to assign')
+    if (!commitInfo) {
+      console.log('No valid commit info')
       return
     }
 
-    core.debug(`assigning userId ${userIdToAssign} to issue #${nodeId}`);
+    const { userId, commitSha, commitUrl, commitDate } = commitInfo
 
-    await addAssigneesToAssignable(client, userIdToAssign, nodeId)
+    core.debug(`assigning userId ${userId} to issue #${issueNodeId}`);
+
+    await addAssigneesToAssignable(client, userId, issueNodeId)
+
+    if (commentsEnabled === 'true') {
+      const commentBody = createCommentBody(
+        userId, 
+        commitSha, 
+        commitUrl, 
+        commitDate
+      )
+      await createComment(client, issueNodeId, commentBody)
+    }
   } catch (error) {
     core.error(error);
     core.setFailed(error.message);
@@ -78,7 +98,7 @@ function getIssueInfo(): IssueInfo | undefined {
 
   return {
     body: issue.body,
-    nodeId: issue.node_id
+    issueNodeId: issue.node_id
   }
 }
 
@@ -102,12 +122,15 @@ function getFileNameAndIssueLine(body: string): ReportedInfo {
       selectedFile = file[0].replace(/"/g, '').split('/').slice(2).join('/')
       selectedLine = parseInt(line[0])
    } else {
-     const usedFile = body.match(/file: \s*(\S+)/i)
-     const usedLine = body.match(/Line: \s*(\S+)/i)
-     const usedBranch = body.match(/Branch: \s*(\S+)/i)
-     selectedFile = usedFile ? usedFile[1] : null
-     selectedLine = usedLine ? usedLine[1] : null
-     selectedBranch = usedBranch ? usedBranch[1] : 'master'
+    const url = body.match(/blob\/\s*(\S+)/i)
+
+    if (url) {
+      const urlInfo = url[1].split('/')
+      selectedBranch = urlInfo[0]
+      const [file, line] = urlInfo.pop()!.split('#L')
+      selectedFile = urlInfo.slice(1).concat(file).join('/')
+      selectedLine = line
+    }
    }
 
    return {
@@ -122,7 +145,7 @@ async function getGitBlame(
   reportedFile: string,
   reportedLine: number,
   branch: string
-): Promise<string | undefined> {
+): Promise<CommitInfo | undefined> {
   const repository = github.context.payload.repository
 
   if (!(repository && repository.full_name)) {
@@ -145,6 +168,9 @@ async function getGitBlame(
             blame(path: $path) {
               ranges {
                 commit {
+                  abbreviatedOid
+                  authoredDate
+                  commitUrl
                   author {
                     user {
                       id
@@ -183,13 +209,19 @@ async function getGitBlame(
       selectedBlame = sortedBlame[0]
     }
 
-    const userId = selectedBlame.commit.author.user.id
+    const commit = selectedBlame.commit
+    const userId = commit.author.user.id
 
     if (!_.find(assignableUsers, { id: userId })) {
       return
     }
 
-    return userId
+    return {
+      userId,
+      commitSha: commit.abbreviatedOid,
+      commitUrl: commit.commitUrl,
+      commitDate: commit.authoredDate
+    }
   }
 }
 
@@ -211,6 +243,40 @@ async function addAssigneesToAssignable(
     input: {
       assignableId: issueNodeId,
       assigneeIds: [userId]
+    }
+  })
+}
+
+function createCommentBody(
+  authorId: string, 
+  commitSHA: string, 
+  commitUrl: string,
+  commitDate: string
+) {
+  return `
+### Commit information
+| | |
+| --- | --- |
+| **Author** | ${authorId} |
+| **Commit** | <a href="${commitUrl}">${commitSHA}</a> |
+| **Commit date** | ${commitDate} |
+  `
+}
+
+async function createComment(
+  client: github.GitHub, 
+  issueNodeId: string,
+  body: string
+): Promise<void> {
+  await client.graphql(`mutation AddComment($input: AddCommentInput!) {
+    addComment(input:$input) {
+      clientMutationId
+    }
+  }
+  `, {
+    input: {
+      subjectId: issueNodeId,
+      body
     }
   })
 }

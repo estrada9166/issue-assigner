@@ -6,6 +6,9 @@ author: 'estrada9166'
 inputs: 
   GITHUB_TOKEN:
     description: 'The GITHUB_TOKEN secret'
+  WITH_COMMENTS:
+    description: 'Create comments with the commit information'
+    default: 'true'
 runs:
   using: 'node12'
   main: 'lib/main.js'
