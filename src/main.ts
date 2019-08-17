@@ -15,6 +15,7 @@ type IssueInfo = {
 
 type CommitInfo = {
   userId: string
+  username: string
   commitSha: string
   commitUrl: string
   commitDate: string
@@ -69,7 +70,7 @@ async function run() {
       return
     }
 
-    const { userId, commitSha, commitUrl, commitDate } = commitInfo
+    const { userId, username, commitSha, commitUrl, commitDate } = commitInfo
 
     core.debug(`assigning userId ${userId} to issue #${issueNodeId}`);
 
@@ -77,7 +78,7 @@ async function run() {
 
     if (commentsEnabled === 'true') {
       const commentBody = createCommentBody(
-        userId, 
+        username, 
         commitSha, 
         commitUrl, 
         commitDate
@@ -173,6 +174,7 @@ async function getGitBlame(
                   commitUrl
                   author {
                     user {
+                      login
                       id
                     }
                   }
@@ -211,6 +213,7 @@ async function getGitBlame(
 
     const commit = selectedBlame.commit
     const userId = commit.author.user.id
+    const username = commit.author.user.login
 
     if (!_.find(assignableUsers, { id: userId })) {
       return
@@ -218,6 +221,7 @@ async function getGitBlame(
 
     return {
       userId,
+      username,
       commitSha: commit.abbreviatedOid,
       commitUrl: commit.commitUrl,
       commitDate: commit.authoredDate
@@ -248,7 +252,7 @@ async function addAssigneesToAssignable(
 }
 
 function createCommentBody(
-  authorId: string, 
+  username: string, 
   commitSHA: string, 
   commitUrl: string,
   commitDate: string
@@ -257,7 +261,7 @@ function createCommentBody(
 ### Commit information
 | | |
 | --- | --- |
-| **Author** | ${authorId} |
+| **Author** | ${username} |
 | **Commit** | <a href="${commitUrl}">${commitSHA}</a> |
 | **Commit date** | ${commitDate} |
   `
