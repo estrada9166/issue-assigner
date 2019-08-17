@@ -97,10 +97,8 @@ function getIssueInfo(): IssueInfo | undefined {
     return
   }
 
-  console.log('github.context.payload', github.context.payload)
-
   return {
-    body: issue.body,
+    body: issue.comment.body || issue.body,
     issueNodeId: issue.node_id
   }
 }
