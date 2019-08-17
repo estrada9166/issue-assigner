@@ -1,0 +1,31 @@
+{
+  "name": "issue-assigner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Assign issues using gitlog",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/estrada9166/issue-assigner"
+  },
+  "keywords": [
+    "actions",
+    "node",
+    "setup"
+  ],
+  "author": "estrada9166",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.0.0",
+    "@actions/github": "^1.0.0",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.136",
+    "@types/node": "^12.7.2",
+    "typescript": "^3.5.3"
+  }
+}

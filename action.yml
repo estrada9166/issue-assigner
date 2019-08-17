@@ -1,0 +1,12 @@
+name: 'Issue assigner'
+description: 'Assign issues using gitlog'
+icon: 'alert-octagon'
+color: 'yellow'
+author: 'estrada9166'
+inputs: 
+  GITHUB_TOKEN:
+    description: 'The GITHUB_TOKEN secret'
+runs:
+  using: 'node12'
+  command: yarn install
+  main: 'lib/main.js'

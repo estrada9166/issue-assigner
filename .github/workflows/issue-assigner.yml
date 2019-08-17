@@ -1,0 +1,23 @@
+name: Issue assigner
+
+on: 
+- issues
+
+jobs:
+  build:
+    name: Issue assigner
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        version: 10.x
+    - name: Install Dependencies
+      run: yarn install 
+    - name: Build
+      run: yarn build
+    - name: Assign user to issue
+      run: node lib/main.js
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
