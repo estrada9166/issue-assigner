@@ -5,7 +5,8 @@
   "description": "Assign issues using gitlog",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --write ./**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@types/lodash": "^4.14.136",
     "@types/node": "^12.7.2",
+    "prettier": "^1.18.2",
     "typescript": "^3.5.3"
   }
 }
