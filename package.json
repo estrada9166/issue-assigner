@@ -33,7 +33,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn build && yarn format && git add ."
+      "pre-commit": "yarn build && yarn format && git add .",
+      "post-commit": "yarn install --production --ignore-scripts --prefer-offline && git add node_modules/* && git commit -m \"Husky commit correct node modules\""
     }
   }
 }
