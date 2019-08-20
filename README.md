@@ -15,11 +15,11 @@ jobs:
     - uses: estrada9166/issue-assigner@v1
       with:
         GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        WITH_COMMENTS: "true"
+        WITH_COMMENTS: true
 ```
 If you don't want this action to post comments on your issue with the commit information, update `.yml` file with
 ```yml
-WITH_COMMENTS: "false"
+WITH_COMMENTS: false
 ```
 
 ## Create an issue
