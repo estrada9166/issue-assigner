@@ -19,9 +19,4 @@ jobs:
 ```
 
 ## Create issue
-Create the issue with the information you want to add and also, add the url
-of where the issue is happening.
-e.g
-```
-https://github.com/estrada9166/issue-assigner/blob/master/src/main.ts#L1
-```
+![example](https://raw.githubusercontent.com/estrada9166/issue-assigner/master/images/example.gif)
